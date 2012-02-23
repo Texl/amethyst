@@ -14,20 +14,22 @@ class Settings
 
     public:
         //application settings
-        static bool            mPaused;
-        static unsigned int    mMaxWindowSize;
+        static bool         mPaused;
+        static unsigned int mMaxWindowSize;
+
+        static bool         mFisheye;
 
         //local illumination settings
-        static bool            mUseAmbient;
-        static bool            mUseDiffuse;
-        static bool            mUseSpecular;
-        static ShadowMode       mShadowMode;
+        static bool         mUseAmbient;
+        static bool         mUseDiffuse;
+        static bool         mUseSpecular;
+        static ShadowMode   mShadowMode;
 
         //global illumination settings
-        static bool            mUseReflection;
-        static bool            mUseRefraction;
-        static bool            mUseAttenuation;
-        static bool            mUseSceneRayDepth;
-        static unsigned int    mMaxRayDepth;
+        static bool         mUseReflection;
+        static bool         mUseRefraction;
+        static bool         mUseAttenuation;
+        static bool         mUseSceneRayDepth;
+        static unsigned int mMaxRayDepth;
 };
 //------------------------------------------------------------------------------

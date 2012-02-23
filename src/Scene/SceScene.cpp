@@ -42,29 +42,36 @@ Scene::GetPixelColor( int const screenWidth, int const screenHeight, int const s
 
     Color color = Color::black();
 
-    for( unsigned int i = 0; i < 4; ++i )
+    int const samples = 4;
+
+    for( unsigned int i = 0; i < samples; ++i )
     {
-        for( unsigned int j = 0; j < 4; ++j )
+        for( unsigned int j = 0; j < samples; ++j )
         {
             float const screenSubX = screenX + i * 0.25f;
             float const screenSubY = screenY + j * 0.25f;
 
-            float const ndcX =    2 * (float)screenSubX / screenWidth - 1;
-            float const ndcY = -( 2 * (float)screenSubY / screenHeight - 1 );
+            float ndcX =    2 * (float)screenSubX / screenWidth - 1;
+            float ndcY = -( 2 * (float)screenSubY / screenHeight - 1 );
+            float ndcZ = 0;
 
-            Vec3f const target = mCamera.u * ndcX + mCamera.v * ndcY;
+            if( Settings::mFisheye )
+            {
+                float radius = math<float>::sqrt( ndcX * ndcX + ndcY * ndcY );
+                float theta = radius * 90.f * 3.14f / 180.0f;
+                ndcX = ndcX / radius * math<float>::sin( theta );
+                ndcY = ndcY / radius * math<float>::sin( theta );
+                ndcZ = math<float>::cos( theta );
+            }
+
+            Vec3f const target = mCamera.c + mCamera.u * ndcX + mCamera.v * ndcY - mCamera.e * ndcZ;
 
             // Construct the pixel's ray, then get its color.
-            Vec3f const direction = ( target - mCamera.e ).normalized();
-            color += _RayTrace( MatRay( eye, direction ), mAir.mNt, rayDepth ) / 16.f;
+            Vec3f const direction = ( target - eye ).normalized();
+
+            color += _RayTrace( MatRay( eye, direction ), mAir.mNt, rayDepth ) / (float)( samples * samples );
         }
     }
-
-    if( screenX == 0 )
-    {
-        console() << (float)(screenY + 1 ) / screenHeight << std::endl;
-    }
-
 
     return color;
 }
@@ -100,6 +107,23 @@ Scene::Load()
         pObject->specularExponent       = 20.f;
         pObject->attenuation            = Color( 0.5f, 0.5f, 0.5f );
         pObject->permittivity           = 2.3716f;
+        pObject->permeability           = 1.f;
+
+        pObject->Precalculate();
+        mSceneObjects.push_back( pObject );
+    }
+
+    {
+        SceObject * pObject = new SceBox();
+        ( ( SceBox * )pObject )->v   = Vec3f( 0, 0.5f, -0.7042f );
+        ( ( SceBox * )pObject )->l   = Vec3f( 0, 0, 0.1f );
+        ( ( SceBox * )pObject )->w   = Vec3f( 0.1f, 0, 0);
+        ( ( SceBox * )pObject )->h   = Vec3f( 0, 0.1f, 0 );
+        pObject->color                  = Color( 0.8f, 0.8f, 0.3f );
+        pObject->specularCoefficient    = 0.0f;
+        pObject->specularExponent       = 20.f;
+        pObject->attenuation            = Color( 0.5f, 0.5f, 0.5f );
+        pObject->permittivity           = 1e6;
         pObject->permeability           = 1.f;
 
         pObject->Precalculate();
@@ -146,6 +170,12 @@ Scene::Load()
     mCamera.u = Vec3f( 0.343626f, -0.274153f, 0.238247f );
     mCamera.v = Vec3f( 0.362222f, 0.234501f, -0.252595f );
     mCamera.e = Vec3f( 0.0535224f, 0.692386f, 0.719539f );
+
+    //mCamera.c = Vec3f( 0, 0.5f, 1.5f );
+    //mCamera.u = Vec3f( 1, 0, 0 );
+    //mCamera.v = Vec3f( 0, 1, 0 );
+    //mCamera.e = Vec3f( 0, 0, 1 );
+
 
     {
         SceLight * pLight = new SceLight();

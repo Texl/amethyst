@@ -46,25 +46,24 @@ void amethystAppApp::setup()
 void
 amethystAppApp::resize( ResizeEvent event )
 {
-    mSurface = Surface8u( getWindowWidth(), getWindowHeight(), false );
-    mTexture = gl::Texture( mSurface );
-
     int height, width;
 
     mScene.CalculateViewSize( width, height, getWindowWidth() );
 
     setWindowSize( width, height );
+
+    mSurface = Surface8u( getWindowWidth(), getWindowHeight(), false );
+    mTexture = gl::Texture( mSurface );
 }
 //------------------------------------------------------------------------------
 void amethystAppApp::mouseDown( MouseEvent event )
 {
     drawLine();
-
-    mTexture.update( (Surface &)mSurface );
 }
 //------------------------------------------------------------------------------
 void amethystAppApp::update()
 {
+    mTexture.update( (Surface &)mSurface );
 }
 //------------------------------------------------------------------------------
 void amethystAppApp::draw()

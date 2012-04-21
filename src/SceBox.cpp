@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
 // File:    SceBox.cpp
 //------------------------------------------------------------------------------
-#include "Scene/SceBox.h"
+#include "SceBox.h"
 //------------------------------------------------------------------------------
 void SceBox::Precalculate()
 {
@@ -22,7 +22,7 @@ void SceBox::Precalculate()
     normals[5] = normals[4] * -1;
 }
 //------------------------------------------------------------------------------
-bool SceBox::FindIntersection( MatRay const & ray, float &t, Vec3f &point, Vec3f &normal)
+bool SceBox::FindIntersection( Ray const & ray, float &t, Vec3f &point, Vec3f &normal)
 {
     float tmin = 0.0f;
     float tmax = FLT_MAX;
@@ -31,8 +31,8 @@ bool SceBox::FindIntersection( MatRay const & ray, float &t, Vec3f &point, Vec3f
 
     for(int i = 0; i < 6 && tmin <= tmax; ++i)
     {
-        float dotDN = ray.mDirection.dot(normals[i]);
-        float dotPPN = ( ray.mOrigin - points[i] ).dot( normals[i]);
+        float dotDN = ray.getDirection().dot(normals[i]);
+        float dotPPN = ( ray.getOrigin() - points[i] ).dot( normals[i]);
         float tint = -dotPPN / dotDN;
         if(dotDN < 0)
         {
@@ -70,7 +70,7 @@ bool SceBox::FindIntersection( MatRay const & ray, float &t, Vec3f &point, Vec3f
         tIndex = tminIndex;
     }
 
-    point = ray.mOrigin + t * ray.mDirection;
+    point = ray.getOrigin() + t * ray.getDirection();
     normal = normals[tIndex];
     return true;
 }

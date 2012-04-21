@@ -1,9 +1,7 @@
 //------------------------------------------------------------------------------
 // File:    ScePolygon.cpp
 //------------------------------------------------------------------------------
-#include <cmath>
-
-#include "Scene/ScePolygon.h"
+#include "ScePolygon.h"
 //------------------------------------------------------------------------------
 void ScePolygon::Precalculate()
 {
@@ -21,15 +19,15 @@ void ScePolygon::Precalculate()
     }
 }
 //------------------------------------------------------------------------------
-bool ScePolygon::FindIntersection( MatRay const & ray, float &t, Vec3f &point, Vec3f &normal)
+bool ScePolygon::FindIntersection( Ray const & ray, float &t, Vec3f &point, Vec3f &normal)
 {
     for(int i = 0; i < n - 2; ++i)
     {
-        float tint = - ( ray.mOrigin - vc[i] ).dot( vn[i] ) / ray.mDirection.dot( vn[i]);
+        float tint = - ( ray.getOrigin() - vc[i] ).dot( vn[i] ) / ray.getDirection().dot( vn[i]);
         if(tint < 0)
             continue;
 
-        Vec3f vpc = ray.mOrigin + ray.mDirection * tint - vc[i];
+        Vec3f vpc = ray.getOrigin() + ray.getDirection() * tint - vc[i];
         float dotVpcVa = vpc.dot( va[i] );
         float dotVpcVb = vpc.dot( vb[i] );
 
@@ -39,7 +37,7 @@ bool ScePolygon::FindIntersection( MatRay const & ray, float &t, Vec3f &point, V
         if(alpha >= 0 && beta >= 0 && alpha + beta <= 1)
         {
             t = tint;
-            point = ray.mOrigin + t * ray.mDirection;
+            point = ray.getOrigin() + t * ray.getDirection();
             normal = vn[i];
             return true;
         }

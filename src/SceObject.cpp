@@ -1,7 +1,19 @@
 //------------------------------------------------------------------------------
 // File:    SceObject.cpp
 //------------------------------------------------------------------------------
-#include "Scene/SceObject.h"
+#include "SceObject.h"
+//------------------------------------------------------------------------------
+SceObject::SceObject()
+: permittivity  ( 0 )
+, permeability  ( 0 )
+{
+}
+//------------------------------------------------------------------------------
+SceObject::SceObject( float const permittivity, float const permeability )
+: permittivity  ( permittivity )
+, permeability  ( permeability )
+{
+}
 //------------------------------------------------------------------------------
 SceObject::~SceObject()
 {

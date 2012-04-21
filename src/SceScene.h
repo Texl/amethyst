@@ -5,11 +5,11 @@
 //------------------------------------------------------------------------------
 #include <string>
 #include <vector>
-#include "Scene/SceAir.h"
-#include "Scene/SceCamera.h"
-#include "Scene/SceLight.h"
-#include "Scene/SceObject.h"
-#include "Math/MatRay.h"
+#include "SceAir.h"
+#include "SceCamera.h"
+#include "SceLight.h"
+#include "SceObject.h"
+#include "cinder/Ray.h"
 
 #include "cinder/app/AppBasic.h"
 #include "cinder/Vector.h"
@@ -34,9 +34,9 @@ class Scene
 
     private:
         void                _Reset                      ();
-        Color               _RayTrace                   ( MatRay const & ray, float ni, int const depth );
-        bool                _FindNearestIntersection    ( unsigned int & index, MatRay const & ray, Vec3f & point, Vec3f & normal );
-        Color               _GetLocalIllumination       ( unsigned int index, MatRay const & ray, Vec3f const & point, Vec3f const & normal, float setKs = -1 );
+        Color               _RayTrace                   ( Ray const & ray, float ni, int const depth );
+        bool                _FindNearestIntersection    ( unsigned int & index, Ray const & ray, Vec3f & point, Vec3f & normal );
+        Color               _GetLocalIllumination       ( unsigned int index, Ray const & ray, Vec3f const & point, Vec3f const & normal, float setKs = -1 );
 
         SceCamera           mCamera;
         Color               mAmbientColor;

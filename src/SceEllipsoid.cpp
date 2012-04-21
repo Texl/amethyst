@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------------
 #include <cmath>
 
-#include "Scene/SceEllipsoid.h"
+#include "SceEllipsoid.h"
 //------------------------------------------------------------------------------
 void SceEllipsoid::Precalculate()
 {
@@ -16,13 +16,13 @@ void SceEllipsoid::Precalculate()
     mInvTInv =  mInv.transposed() * mInv;
 }
 //------------------------------------------------------------------------------
-bool SceEllipsoid::FindIntersection( MatRay const & ray, float & t, Vec3f & point, Vec3f & normal)
+bool SceEllipsoid::FindIntersection( Ray const & ray, float & t, Vec3f & point, Vec3f & normal)
 {
-    MatRay const mInvRay( mInv * ( ray.mOrigin - c ), mInv * ray.mDirection );
+    Ray const mInvRay( mInv * ( ray.getOrigin() - c ), mInv * ray.getDirection() );
 
-    float const pa = mInvRay.mDirection.dot( mInvRay.mDirection );
-    float const pb = 2 * mInvRay.mOrigin.dot( mInvRay.mDirection );
-    float const pc = mInvRay.mOrigin.dot( mInvRay.mOrigin ) - 1.0f;
+    float const pa = mInvRay.getDirection().dot( mInvRay.getDirection() );
+    float const pb = 2 * mInvRay.getOrigin().dot( mInvRay.getDirection() );
+    float const pc = mInvRay.getOrigin().dot( mInvRay.getOrigin() ) - 1.0f;
 
     float const discriminant = pb * pb - 4 * pa * pc;
 
@@ -51,7 +51,7 @@ bool SceEllipsoid::FindIntersection( MatRay const & ray, float & t, Vec3f & poin
         t = (float)( 0.5f * tminus / pa );
     }
 
-    point = ray.mOrigin + t * ray.mDirection;
+    point = ray.getOrigin() + t * ray.getDirection();
     normal = ( mInvTInv * ( point - c ) ).normalized();
     return true;
 }

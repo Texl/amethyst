@@ -108,36 +108,38 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\amethystApp.cpp" />
-    <ClCompile Include="..\src\Application\AppSettings.cpp" />
-    <ClCompile Include="..\src\Math\MatRay.cpp" />
-    <ClCompile Include="..\src\Scene\SceAir.cpp" />
-    <ClCompile Include="..\src\Scene\SceBox.cpp" />
-    <ClCompile Include="..\src\Scene\SceCamera.cpp" />
-    <ClCompile Include="..\src\Scene\SceEllipsoid.cpp" />
-    <ClCompile Include="..\src\Scene\SceLight.cpp" />
-    <ClCompile Include="..\src\Scene\SceObject.cpp" />
-    <ClCompile Include="..\src\Scene\ScePolygon.cpp" />
-    <ClCompile Include="..\src\Scene\SceScene.cpp" />
-    <ClCompile Include="..\src\Scene\SceSphere.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="..\include\Resources.h" />
-    <ClInclude Include="..\src\Application\AppSettings.h" />
-    <ClInclude Include="..\src\Math\MatRay.h" />
-    <ClInclude Include="..\src\Scene\SceAir.h" />
-    <ClInclude Include="..\src\Scene\SceBox.h" />
-    <ClInclude Include="..\src\Scene\SceCamera.h" />
-    <ClInclude Include="..\src\Scene\SceEllipsoid.h" />
-    <ClInclude Include="..\src\Scene\SceHitInfo.h" />
-    <ClInclude Include="..\src\Scene\SceLight.h" />
-    <ClInclude Include="..\src\Scene\SceObject.h" />
-    <ClInclude Include="..\src\Scene\ScePolygon.h" />
-    <ClInclude Include="..\src\Scene\SceScene.h" />
-    <ClInclude Include="..\src\Scene\SceSphere.h" />
+    <ClInclude Include="..\src\AppSettings.h" />
+    <ClInclude Include="..\src\Intersection.h" />
+    <ClInclude Include="..\src\Material.h" />
+    <ClInclude Include="..\src\Plane.h" />
+    <ClInclude Include="..\src\SceAir.h" />
+    <ClInclude Include="..\src\SceBox.h" />
+    <ClInclude Include="..\src\SceCamera.h" />
+    <ClInclude Include="..\src\SceEllipsoid.h" />
+    <ClInclude Include="..\src\SceHitInfo.h" />
+    <ClInclude Include="..\src\SceLight.h" />
+    <ClInclude Include="..\src\SceObject.h" />
+    <ClInclude Include="..\src\ScePolygon.h" />
+    <ClInclude Include="..\src\SceScene.h" />
+    <ClInclude Include="..\src\SceSphere.h" />
+    <ClInclude Include="..\src\Triangle.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\Application.cpp" />
+    <ClCompile Include="..\src\AppSettings.cpp" />
+    <ClCompile Include="..\src\SceAir.cpp" />
+    <ClCompile Include="..\src\SceBox.cpp" />
+    <ClCompile Include="..\src\SceCamera.cpp" />
+    <ClCompile Include="..\src\SceEllipsoid.cpp" />
+    <ClCompile Include="..\src\SceLight.cpp" />
+    <ClCompile Include="..\src\SceObject.cpp" />
+    <ClCompile Include="..\src\ScePolygon.cpp" />
+    <ClCompile Include="..\src\SceScene.cpp" />
+    <ClCompile Include="..\src\SceSphere.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

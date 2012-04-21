@@ -1,20 +1,19 @@
 //------------------------------------------------------------------------------
-// File:    MatRay.h
+// File:    SceSphere.cpp
 //------------------------------------------------------------------------------
 #pragma once
 //------------------------------------------------------------------------------
+#include "cinder/Ray.h"
 #include "cinder/Vector.h"
+#include "SceObject.h"
 //------------------------------------------------------------------------------
-using namespace ci;
-//------------------------------------------------------------------------------
-class MatRay
+class SceSphere: public SceObject
 {
     public:
-        // TODO: Remove default constructor.
-        explicit    MatRay  ();
-        explicit    MatRay  ( Vec3f const & origin, Vec3f const & direction );
+        Vec3f c;
+        float r;
 
-        Vec3f   mOrigin;
-        Vec3f   mDirection;
+        void Precalculate();
+        bool FindIntersection( Ray const & ray, float &t, Vec3f &point, Vec3f &normal);
 };
 //------------------------------------------------------------------------------

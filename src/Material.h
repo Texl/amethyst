@@ -1,23 +1,16 @@
 //------------------------------------------------------------------------------
-// File:    SceObject.cpp
+// File:    Material.h
 //------------------------------------------------------------------------------
 #pragma once
 //------------------------------------------------------------------------------
-#include "cinder/Vector.h"
-#include "Math/MatRay.h"
 #include "cinder/Color.h"
+#include "cinder/Vector.h"
 //------------------------------------------------------------------------------
 using namespace ci;
 //------------------------------------------------------------------------------
-class SceObject
+class Material
 {
     public:
-        virtual         ~SceObject          ();
-
-        virtual bool    FindIntersection    ( MatRay const & ray, float & t, Vec3f & point, Vec3f & normal ) = 0;
-        virtual void    Precalculate        ();
-
-        //surface properties
         Color   color;
         float   specularCoefficient;
         float   specularExponent;
@@ -26,4 +19,4 @@ class SceObject
         float   permeability;
         float   nt;
 };
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------

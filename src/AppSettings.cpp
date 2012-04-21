@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-#include "Application/AppSettings.h"
+#include "AppSettings.h"
 //------------------------------------------------------------------------------
 bool                    Settings::mFisheye          = true;
 
@@ -13,4 +13,6 @@ bool                    Settings::mUseRefraction    = true;
 bool                    Settings::mUseAttenuation   = true;
 bool                    Settings::mUseSceneRayDepth = false;
 unsigned int            Settings::mMaxRayDepth      = 3;
+
+unsigned int            Settings::mMultisampleCount = 4;
 //------------------------------------------------------------------------------

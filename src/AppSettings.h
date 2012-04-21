@@ -31,5 +31,7 @@ class Settings
         static bool         mUseAttenuation;
         static bool         mUseSceneRayDepth;
         static unsigned int mMaxRayDepth;
+
+        static unsigned int mMultisampleCount;
 };
 //------------------------------------------------------------------------------

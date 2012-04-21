@@ -1,29 +1,25 @@
 //------------------------------------------------------------------------------
-// File:    SceEllipsoid.cpp
+// File:    SceBox.cpp
 //------------------------------------------------------------------------------
 #pragma once
 //------------------------------------------------------------------------------
-#include "Math/MatRay.h"
+#include "SceObject.h"
+#include "cinder/Ray.h"
 #include "cinder/Vector.h"
-#include "Scene/SceObject.h"
-#include "cinder/Matrix.h"
 //------------------------------------------------------------------------------
-using namespace ci;
-//------------------------------------------------------------------------------
-class SceEllipsoid : public SceObject
+class SceBox: public SceObject
 {
     public:
         void Precalculate       ();
-        bool FindIntersection   ( MatRay const & ray, float & t, Vec3f & point, Vec3f & normal );
+        bool FindIntersection   ( Ray const & ray, float &t, Vec3f & point, Vec3f & normal );
 
-        Vec3f c;
-        Vec3f u;
         Vec3f v;
+        Vec3f l;
         Vec3f w;
+        Vec3f h;
 
         //precalculated variables
-        Matrix33f m;
-        Matrix33f mInv;
-        Matrix33f mInvTInv;
+        Vec3f points[6];
+        Vec3f normals[6];
 };
 //------------------------------------------------------------------------------

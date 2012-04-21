@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------------
 #include <cmath>
 
-#include "Scene/SceSphere.h"
+#include "SceSphere.h"
 //------------------------------------------------------------------------------
 void
 SceSphere::Precalculate()
@@ -12,11 +12,11 @@ SceSphere::Precalculate()
 }
 //------------------------------------------------------------------------------
 bool
-SceSphere::FindIntersection( MatRay const & ray, float & t, Vec3f & point, Vec3f & normal)
+SceSphere::FindIntersection( Ray const & ray, float & t, Vec3f & point, Vec3f & normal)
 {
-    Vec3f vectorCP = ray.mOrigin - c;
-    float pa = ray.mDirection.dot( ray.mDirection );
-    float pb = 2 * vectorCP.dot( ray.mDirection );
+    Vec3f vectorCP = ray.getOrigin() - c;
+    float pa = ray.getDirection().dot( ray.getDirection() );
+    float pb = 2 * vectorCP.dot( ray.getDirection() );
     float pc = vectorCP.dot( vectorCP ) - r * r;
 
     float discriminant = pb * pb - 4 * pa * pc;
@@ -37,7 +37,7 @@ SceSphere::FindIntersection( MatRay const & ray, float & t, Vec3f & point, Vec3f
     else
         t = tminus / (2 * pa);
 
-    point = ray.mOrigin + t * ray.mDirection;
+    point = ray.getOrigin() + t * ray.getDirection();
     normal = ( point - c ) / r;
     normal.normalize();
     return true;

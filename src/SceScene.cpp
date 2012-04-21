@@ -1,11 +1,11 @@
 //------------------------------------------------------------------------------
-#include "Scene/SceBox.h"
-#include "Scene/SceEllipsoid.h"
-#include "Scene/ScePolygon.h"
-#include "Scene/SceScene.h"
-#include "Scene/SceSphere.h"
+#include "SceBox.h"
+#include "SceEllipsoid.h"
+#include "ScePolygon.h"
+#include "SceScene.h"
+#include "SceSphere.h"
 
-#include "Application/AppSettings.h"
+#include "AppSettings.h"
 //------------------------------------------------------------------------------
 Scene::Scene()
 : mCamera       ()
@@ -42,11 +42,11 @@ Scene::GetPixelColor( int const screenWidth, int const screenHeight, int const s
 
     Color color = Color::black();
 
-    int const samples = 4;
+    float const contribution = 1.0f / (Settings::mMultisampleCount * Settings::mMultisampleCount);
 
-    for( unsigned int i = 0; i < samples; ++i )
+    for( unsigned int i = 0; i < Settings::mMultisampleCount; ++i )
     {
-        for( unsigned int j = 0; j < samples; ++j )
+        for( unsigned int j = 0; j < Settings::mMultisampleCount; ++j )
         {
             float const screenSubX = screenX + i * 0.25f;
             float const screenSubY = screenY + j * 0.25f;
@@ -58,7 +58,7 @@ Scene::GetPixelColor( int const screenWidth, int const screenHeight, int const s
             if( Settings::mFisheye )
             {
                 float radius = math<float>::sqrt( ndcX * ndcX + ndcY * ndcY );
-                float theta = radius * 90.f * 3.14f / 180.0f;
+                float theta = radius * toRadians(90.f);
                 ndcX = ndcX / radius * math<float>::sin( theta );
                 ndcY = ndcY / radius * math<float>::sin( theta );
                 ndcZ = math<float>::cos( theta );
@@ -69,7 +69,7 @@ Scene::GetPixelColor( int const screenWidth, int const screenHeight, int const s
             // Construct the pixel's ray, then get its color.
             Vec3f const direction = ( target - eye ).normalized();
 
-            color += _RayTrace( MatRay( eye, direction ), mAir.mNt, rayDepth ) / (float)( samples * samples );
+            color += _RayTrace( Ray( eye, direction ), mAir.mNt, rayDepth ) * contribution;
         }
     }
 
@@ -171,7 +171,7 @@ Scene::Load()
     mCamera.v = Vec3f( 0.362222f, 0.234501f, -0.252595f );
     mCamera.e = Vec3f( 0.0535224f, 0.692386f, 0.719539f );
 
-    //mCamera.c = Vec3f( 0, 0.5f, 1.5f );
+    //mCamera.c = Vec3f( 0, 0.5f, 0.1f );
     //mCamera.u = Vec3f( 1, 0, 0 );
     //mCamera.v = Vec3f( 0, 1, 0 );
     //mCamera.e = Vec3f( 0, 0, 1 );
@@ -239,7 +239,7 @@ Scene::_Reset()
 }
 //------------------------------------------------------------------------------
 Color
-Scene::_RayTrace( MatRay const & ray, float const ni, int const depth )
+Scene::_RayTrace( Ray const & ray, float const ni, int const depth )
 {
     //find the nearest intersection's object index, intersection point, and surface normal
     unsigned int index;
@@ -271,7 +271,7 @@ Scene::_RayTrace( MatRay const & ray, float const ni, int const depth )
     if( Settings::mUseReflection || Settings::mUseRefraction )
     {
         //calculate the incident vector
-        Vec3f const incident = -ray.mDirection;
+        Vec3f const incident = -ray.getDirection();
 
         //calculate R, T, and reflection/transmission vectors
         float const nRatio = ni / nt;
@@ -337,19 +337,19 @@ Scene::_RayTrace( MatRay const & ray, float const ni, int const depth )
 
     if( R != 0 && Settings::mUseReflection )
     {
-        MatRay const reflectionRay = MatRay(point + (float)EPSILON * normal, reflectionVector);
+        Ray const reflectionRay = Ray(point + (float)EPSILON * normal, reflectionVector);
         color += R * _RayTrace(reflectionRay, ni, depth - 1);
     }
 
     if( T != 0 && Settings::mUseRefraction )
     {
-        MatRay const transmissionRay = MatRay(point - (float)EPSILON * normal, transmissionVector);
+        Ray const transmissionRay = Ray(point - (float)EPSILON * normal, transmissionVector);
         color += T * _RayTrace(transmissionRay, nt, depth - 1);
     }
 
     if( attenuation != Color( 1, 1, 1 ) && Settings::mUseAttenuation )
     {
-        float exponent = ( ray.mOrigin - point ).length();
+        float exponent = ( ray.getOrigin() - point ).length();
         color *= Color( math<float>().pow( attenuation.r, exponent ),
                         math<float>().pow( attenuation.g, exponent ),
                         math<float>().pow( attenuation.b, exponent ) );
@@ -359,7 +359,7 @@ Scene::_RayTrace( MatRay const & ray, float const ni, int const depth )
 }
 //------------------------------------------------------------------------------
 bool
-Scene::_FindNearestIntersection( unsigned int & index, MatRay const & ray, Vec3f & point, Vec3f & normal )
+Scene::_FindNearestIntersection( unsigned int & index, Ray const & ray, Vec3f & point, Vec3f & normal )
 {
     bool result = false;
     float t;
@@ -390,7 +390,7 @@ Scene::_FindNearestIntersection( unsigned int & index, MatRay const & ray, Vec3f
 }
 //------------------------------------------------------------------------------
 Color
-Scene::_GetLocalIllumination( unsigned int index, MatRay const & ray, Vec3f const & point, Vec3f const & normal, float setKs )
+Scene::_GetLocalIllumination( unsigned int index, Ray const & ray, Vec3f const & point, Vec3f const & normal, float setKs )
 {
     Color ambient, diffuse, specular;
 
@@ -423,7 +423,7 @@ Scene::_GetLocalIllumination( unsigned int index, MatRay const & ray, Vec3f cons
         {
             case Settings::kShadowMode_Hard:
                 //determine if pixel is shadowed entirely from current light
-                if( _FindNearestIntersection( uiDummy, MatRay( point + normal * (float)EPSILON, lightVector ), shadowPoint, Vec3f() ) )
+                if( _FindNearestIntersection( uiDummy, Ray( point + normal * (float)EPSILON, lightVector ), shadowPoint, Vec3f() ) )
                 {
                     if( ( shadowPoint - point ).length() < ( mLights[i]->p - point ).length() )
                     {
@@ -454,7 +454,7 @@ Scene::_GetLocalIllumination( unsigned int index, MatRay const & ray, Vec3f cons
         {
             //calculate specular contribution
             reflectionVector = ( normal * 2.0f * dotNL - lightVector ).normalized();
-            viewVector = ( ray.mDirection * -1 ).normalized();
+            viewVector = ( ray.getDirection() * -1 ).normalized();
 
             float dotRV = reflectionVector.dot( viewVector );
             if(dotRV < 0.0)

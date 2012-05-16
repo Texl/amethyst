@@ -5,41 +5,49 @@
 
 #include "SceSphere.h"
 //------------------------------------------------------------------------------
-void
-SceSphere::Precalculate()
+SceSphere::SceSphere( Vec3f const & center, float const radius, Material const & material )
+: SceObject ( material )
+, c         ( center )
+, r         ( radius )
 {
-    SceObject::Precalculate();
 }
 //------------------------------------------------------------------------------
 bool
 SceSphere::FindIntersection( Ray const & ray, float & t, Vec3f & point, Vec3f & normal)
 {
-    Vec3f vectorCP = ray.getOrigin() - c;
-    float pa = ray.getDirection().dot( ray.getDirection() );
-    float pb = 2 * vectorCP.dot( ray.getDirection() );
-    float pc = vectorCP.dot( vectorCP ) - r * r;
+    Vec3f const vectorCP = ray.getOrigin() - c;
+    float const pa = ray.getDirection().lengthSquared();
+    float const pb = 2 * vectorCP.dot( ray.getDirection() );
+    float const pc = vectorCP.lengthSquared() - r * r;
 
-    float discriminant = pb * pb - 4 * pa * pc;
+    float const discriminant = pb * pb - 4 * pa * pc;
 
-    if(discriminant < 0)
+    if( discriminant < 0 )
+    {
         return false;
+    }
 
-    float sqrtDiscriminant = sqrt(discriminant);
+    float const sqrtDiscriminant = math<float>::sqrt( discriminant );
 
-    float tplus = -pb + sqrtDiscriminant;
+    float const tplus = -pb + sqrtDiscriminant;
 
-    if(tplus < 0)
+    if( tplus < 0 )
+    {
         return false;
+    }
 
-    float tminus = -pb - sqrtDiscriminant;
-    if(tminus < 0)
-        t = tplus / (2 * pa);
+    float const tminus = -pb - sqrtDiscriminant;
+    if( tminus < 0 )
+    {
+        t = tplus / ( 2 * pa );
+    }
     else
-        t = tminus / (2 * pa);
+    {
+        t = tminus / ( 2 * pa );
+    }
 
-    point = ray.getOrigin() + t * ray.getDirection();
+    point = ray.calcPosition( t );
     normal = ( point - c ) / r;
-    normal.normalize();
     return true;
 }
 //------------------------------------------------------------------------------

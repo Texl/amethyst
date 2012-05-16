@@ -11,8 +11,19 @@ using namespace ci;
 class SceLight
 {
     public:
-        Vec3f  p;
-        Color       c;
-        float       r;
+        SceLight    (Vec3f const & p, Color const & c, float r);
+
+    public:
+        Vec3f   p;
+        Color   c;
+        float   r;
 };
+//------------------------------------------------------------------------------
+inline
+SceLight::SceLight(Vec3f const & p, Color const & c, float r)
+: p ( p )
+, c ( c )
+, r ( r )
+{
+}
 //------------------------------------------------------------------------------

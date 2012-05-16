@@ -13,9 +13,10 @@ using namespace ci;
 class SceEllipsoid : public SceObject
 {
     public:
-        void Precalculate       ();
-        bool FindIntersection   ( Ray const & ray, float & t, Vec3f & point, Vec3f & normal );
+        explicit    SceEllipsoid        ( Vec3f const & c, Vec3f const & u, Vec3f const & v, Vec3f const & w, Material const & material );
+        bool        FindIntersection    ( Ray const & ray, float & t, Vec3f & point, Vec3f & normal );
 
+    private:
         Vec3f c;
         Vec3f u;
         Vec3f v;

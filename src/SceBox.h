@@ -10,15 +10,15 @@
 class SceBox: public SceObject
 {
     public:
-        void Precalculate       ();
-        bool FindIntersection   ( Ray const & ray, float &t, Vec3f & point, Vec3f & normal );
+        explicit    SceBox              ( Vec3f const & v, Vec3f const & l, Vec3f const & w, Vec3f const & h, Material const & material );
+        bool        FindIntersection    ( Ray const & ray, float & t, Vec3f & point, Vec3f & normal );
 
+    private:
         Vec3f v;
         Vec3f l;
         Vec3f w;
         Vec3f h;
 
-        //precalculated variables
         Vec3f points[6];
         Vec3f normals[6];
 };

@@ -110,10 +110,8 @@
   <ItemGroup>
     <ClInclude Include="..\include\Resources.h" />
     <ClInclude Include="..\src\AppSettings.h" />
-    <ClInclude Include="..\src\Intersection.h" />
     <ClInclude Include="..\src\Material.h" />
     <ClInclude Include="..\src\Plane.h" />
-    <ClInclude Include="..\src\SceAir.h" />
     <ClInclude Include="..\src\SceBox.h" />
     <ClInclude Include="..\src\SceCamera.h" />
     <ClInclude Include="..\src\SceEllipsoid.h" />
@@ -131,7 +129,6 @@
   <ItemGroup>
     <ClCompile Include="..\src\Application.cpp" />
     <ClCompile Include="..\src\AppSettings.cpp" />
-    <ClCompile Include="..\src\SceAir.cpp" />
     <ClCompile Include="..\src\SceBox.cpp" />
     <ClCompile Include="..\src\SceCamera.cpp" />
     <ClCompile Include="..\src\SceEllipsoid.cpp" />

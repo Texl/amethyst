@@ -9,14 +9,17 @@
 #include "cinder/Vector.h"
 #include "SceObject.h"
 //------------------------------------------------------------------------------
+using namespace std;
+//------------------------------------------------------------------------------
 class ScePolygon : public SceObject
 {
     public:
-        void Precalculate();
-        bool FindIntersection( Ray const & ray, float &t, Vec3f &point, Vec3f &normal);
+        explicit    ScePolygon          ( vector< Vec3f > const & vertices, Material const & material );
+        bool        FindIntersection    ( Ray const & ray, float & t, Vec3f & point, Vec3f & normal );
 
-        int n;
-        std::vector< Vec3f > v;
+    private:
+        int             n;
+        vector< Vec3f > v;
 
         //precalculated variables
         std::vector< Vec3f >    vc;

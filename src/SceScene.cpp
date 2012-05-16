@@ -35,18 +35,21 @@ Scene::~Scene()
 Color
 Scene::GetPixelColor( int const screenWidth, int const screenHeight, int const screenX, int const screenY )
 {
+    float const windowAspect = (float)screenWidth / screenHeight;
+    float const cameraAspect = mCamera.u.length() / mCamera.v.length();
+
     // Camera parameters
     Vec3f const eye = mCamera.c + mCamera.e;
 
-    unsigned int const rayDepth = Settings::mUseSceneRayDepth ? mMaxRayDepth : Settings::mMaxRayDepth;
+    unsigned int const rayDepth = AppSettings::mUseSceneRayDepth ? mMaxRayDepth : AppSettings::mMaxRayDepth;
 
     Color color = Color::black();
 
-    float const contribution = 1.0f / (Settings::mMultisampleCount * Settings::mMultisampleCount);
+    float const contribution = 1.0f / (AppSettings::mMultisampleCount * AppSettings::mMultisampleCount);
 
-    for( unsigned int i = 0; i < Settings::mMultisampleCount; ++i )
+    for( unsigned int i = 0; i < AppSettings::mMultisampleCount; ++i )
     {
-        for( unsigned int j = 0; j < Settings::mMultisampleCount; ++j )
+        for( unsigned int j = 0; j < AppSettings::mMultisampleCount; ++j )
         {
             float const screenSubX = screenX + i * 0.25f;
             float const screenSubY = screenY + j * 0.25f;
@@ -55,7 +58,7 @@ Scene::GetPixelColor( int const screenWidth, int const screenHeight, int const s
             float ndcY = -( 2 * (float)screenSubY / screenHeight - 1 );
             float ndcZ = 0;
 
-            if( Settings::mFisheye )
+            if( AppSettings::mFisheye )
             {
                 float radius = math<float>::sqrt( ndcX * ndcX + ndcY * ndcY );
                 float theta = radius * toRadians(90.f);
@@ -64,7 +67,7 @@ Scene::GetPixelColor( int const screenWidth, int const screenHeight, int const s
                 ndcZ = math<float>::cos( theta );
             }
 
-            Vec3f const target = mCamera.c + mCamera.u * ndcX + mCamera.v * ndcY - mCamera.e * ndcZ;
+            Vec3f const target = mCamera.c + mCamera.u * windowAspect * ndcX + mCamera.v * ndcY - mCamera.e * ndcZ;
 
             // Construct the pixel's ray, then get its color.
             Vec3f const direction = ( target - eye ).normalized();
@@ -82,88 +85,75 @@ Scene::Load()
     _Reset();
 
     {
-        SceObject * pObject = new SceSphere();
-        ( ( SceSphere * )pObject )->c = Vec3f( 0.5f, 0.25f, -0.5f );
-        ( ( SceSphere * )pObject  )->r = 0.25f;
-        pObject->color                  = Color( 0.5f, 0.7f, 0.5f );
-        pObject->specularCoefficient    = 0.3f;
-        pObject->specularExponent       = 70.f;
-        pObject->attenuation            = Color( 0.f, 0.f, 0.f );
-        pObject->permittivity           = 1e6;
-        pObject->permeability           = 1.f;
-
-        pObject->Precalculate();
-        mSceneObjects.push_back( pObject );
+        Material material;
+        material.mColor                 = Color( 0.5f, 0.7f, 0.5f );
+        material.mSpecularCoefficient   = 0.3f;
+        material.mSpecularExponent      = 70.f;
+        material.mAttenuation           = Color( 0.f, 0.f, 0.f );
+        material.mPermittivity          = 1e6;
+        material.mPermeability          = 1.f;
+        mSceneObjects.push_back( new SceSphere( Vec3f( 0.5f, 0.25f, -0.5f ), 0.2f, material ) );
     }
 
     {
-        SceObject * pObject = new SceBox();
-        ( ( SceBox * )pObject )->v   = Vec3f( -0.2623f, 0.001f, -0.7042f );
-        ( ( SceBox * )pObject )->l   = Vec3f( 0.6495f, 0.f, -0.375f );
-        ( ( SceBox * )pObject )->w   = Vec3f( -0.125f, 0.f, -0.2165f );
-        ( ( SceBox * )pObject )->h   = Vec3f( 0.f, 0.75f, 0.f );
-        pObject->color                  = Color( 0.3f, 0.3f, 0.5f );
-        pObject->specularCoefficient    = 0.8f;
-        pObject->specularExponent       = 20.f;
-        pObject->attenuation            = Color( 0.5f, 0.5f, 0.5f );
-        pObject->permittivity           = 2.3716f;
-        pObject->permeability           = 1.f;
-
-        pObject->Precalculate();
-        mSceneObjects.push_back( pObject );
+        Material material;
+        material.mColor                 = Color( 0.3f, 0.3f, 0.5f );
+        material.mSpecularCoefficient   = 0.3f;
+        material.mSpecularExponent      = 20.f;
+        material.mAttenuation           = Color( 0.5f, 0.5f, 0.5f );
+        material.mPermittivity          = 1e6;
+        material.mPermeability          = 1.f;
+        mSceneObjects.push_back( new SceBox( Vec3f( -0.2623f, 0.001f, -0.7042f ), 
+                                             Vec3f( 0.6495f, 0.f, -0.375f ),
+                                             Vec3f( -0.125f, 0.f, -0.2165f ),
+                                             Vec3f( 0.f, 0.75f, 0.f ),
+                                             material ) );
     }
 
     {
-        SceObject * pObject = new SceBox();
-        ( ( SceBox * )pObject )->v   = Vec3f( 0, 0.5f, -0.7042f );
-        ( ( SceBox * )pObject )->l   = Vec3f( 0, 0, 0.1f );
-        ( ( SceBox * )pObject )->w   = Vec3f( 0.1f, 0, 0);
-        ( ( SceBox * )pObject )->h   = Vec3f( 0, 0.1f, 0 );
-        pObject->color                  = Color( 0.8f, 0.8f, 0.3f );
-        pObject->specularCoefficient    = 0.0f;
-        pObject->specularExponent       = 20.f;
-        pObject->attenuation            = Color( 0.5f, 0.5f, 0.5f );
-        pObject->permittivity           = 1e6;
-        pObject->permeability           = 1.f;
-
-        pObject->Precalculate();
-        mSceneObjects.push_back( pObject );
+        Material material;
+        material.mColor                 = Color( 0.8f, 0.8f, 0.3f );
+        material.mSpecularCoefficient   = 0.0f;
+        material.mSpecularExponent      = 20.f;
+        material.mAttenuation           = Color( 0.5f, 0.5f, 0.5f );
+        material.mPermittivity          = 1e6;
+        material.mPermeability          = 1.f;
+        mSceneObjects.push_back( new SceBox( Vec3f( 0, 0.5f, -0.7042f ),
+                                 Vec3f( 0, 0, 0.1f ),
+                                 Vec3f( 0.1f, 0, 0),
+                                 Vec3f( 0, 0.1f, 0 ),
+                                 material ) );
     }
 
     {
-        SceObject * pObject = new ScePolygon();
-        ( ( ScePolygon * )pObject )->n = 4;
-        ( ( ScePolygon * )pObject )->v.push_back( Vec3f( 1.f, 0.f, 0.f ) );
-        ( ( ScePolygon * )pObject )->v.push_back( Vec3f( 1.f, 0.f, -2.f ) );
-        ( ( ScePolygon * )pObject )->v.push_back( Vec3f( -1.f, 0.f, -2.f ) );
-        ( ( ScePolygon * )pObject )->v.push_back( Vec3f( -1.f, 0.f, 0.f ) );
-        pObject->color                  = Color( 0.6f, 0.6f, 0.6f );
-        pObject->specularCoefficient    = 0.4f;
-        pObject->specularExponent       = 20.f;
-        pObject->attenuation            = Color( 0.f, 0.f, 0.f );
-        pObject->permittivity           = 1e6;
-        pObject->permeability           = 1.f;
-
-        pObject->Precalculate();
-        mSceneObjects.push_back( pObject );
+        vector< Vec3f > v;
+        v.push_back( Vec3f( 1.f, 0.f, 0.f ) );
+        v.push_back( Vec3f( 1.f, 0.f, -2.f ) );
+        v.push_back( Vec3f( -1.f, 0.f, -2.f ) );
+        v.push_back( Vec3f( -1.f, 0.f, 0.f ) );
+        Material material;
+        material.mColor                 = Color( 0.6f, 0.6f, 0.6f );
+        material.mSpecularCoefficient   = 0.4f;
+        material.mSpecularExponent      = 20.f;
+        material.mAttenuation           = Color( 0.f, 0.f, 0.f );
+        material.mPermittivity          = 1e6;
+        material.mPermeability          = 1.f;
+        mSceneObjects.push_back( new ScePolygon( v, material) );
     }
 
     {
-        SceObject * pObject = new SceEllipsoid();
-        ( ( SceEllipsoid * )pObject )->c    = Vec3f( -0.5f, 0.5f, -1.5f );
-        ( ( SceEllipsoid * )pObject )->u    = Vec3f( 0.25f, 0.f, 0.f );
-        ( ( SceEllipsoid * )pObject )->v    = Vec3f( 0.f, 0.5f, 0.f );
-        ( ( SceEllipsoid * )pObject )->w    = Vec3f( 0.f, 0.f, 0.25f );
-
-        pObject->color                  = Color( 0.7f, 0.5f, 0.5f );
-        pObject->specularCoefficient    = 0.3f;
-        pObject->specularExponent       = 70.f;
-        pObject->attenuation            = Color( 0.f, 0.f, 0.f );
-        pObject->permittivity           = 1e6;
-        pObject->permeability           = 1.f;
-
-        pObject->Precalculate();
-        mSceneObjects.push_back( pObject );
+        Material material;
+        material.mColor                 =  Color( 0.7f, 0.5f, 0.5f );
+        material.mSpecularCoefficient   = 0.3f;
+        material.mSpecularExponent      = 70.f;
+        material.mAttenuation           = Color( 0.f, 0.f, 0.f );
+        material.mPermittivity          = 1e6;
+        material.mPermeability          = 1.f;
+        mSceneObjects.push_back( new SceEllipsoid( Vec3f( -0.5f, 0.5f, -1.5f ),
+                                                   Vec3f( 0.25f, 0.f, 0.f ),
+                                                   Vec3f( 0.f, 0.5f, 0.f ),
+                                                   Vec3f( 0.f, 0.f, 0.25f ),
+                                                   material ) );
     }
 
     mCamera.c = Vec3f( 0.0267612f, 0.846193f, -0.14023f );
@@ -178,21 +168,15 @@ Scene::Load()
 
 
     {
-        SceLight * pLight = new SceLight();
-        pLight->p = Vec3f( -1.f, 1.f, 0.f );
-        pLight->c = Color(1.f, 1.f, 1.f);
-        pLight->r = 0.1f;
-
-        mLights.push_back( pLight );
+        mLights.push_back( new SceLight(Vec3f( -1.f, 1.f, 0.f ),
+                                        Color( 1.f, 1.f, 1.f ),
+                                        0.1f ) );
     }
 
     {
-        SceLight * pLight = new SceLight();
-        pLight->p = Vec3f( 0.75f, 0.5f, 0.f );
-        pLight->c = Color( 0.8f, 0.8f, 0.8f );
-        pLight->r = 0.2f;
-
-        mLights.push_back( pLight );
+        mLights.push_back( new SceLight(Vec3f( 0.75f, 0.5f, 0.f ),
+                                        Color( 0.8f, 0.8f, 0.8f ),
+                                        0.2f ) );
     }
 
     // Do any required scene precalculation.
@@ -202,27 +186,10 @@ Scene::Load()
 }
 //------------------------------------------------------------------------------
 void
-Scene::CalculateViewSize(int & width, int & height, int const maxDimension)
-{
-    float const aspect = mCamera.u.length() / mCamera.v.length();
-
-    if( aspect > 1.0 )
-    {
-        width = maxDimension;
-        height = (int)( width / aspect );
-    }
-    else
-    {
-        height = maxDimension;
-        width = (int)( height * aspect );
-    }
-}
-//------------------------------------------------------------------------------
-void
 Scene::_Reset()
 {
     mAmbientColor       = Color( 0, 0, 0 );
-    mAir.mC             = Color( 1, 1, 1 );
+    mAir.mAttenuation   = Color( 1, 1, 1 );
     mAir.mPermeability  = 1.0;
     mAir.mPermittivity  = 1.0;
 
@@ -265,10 +232,10 @@ Scene::_RayTrace( Ray const & ray, float const ni, int const depth )
     Vec3f transmissionVector;
 
     //find the index of refraction and attenuation factor for the transmitting medium
-    float const nt          = ni == mAir.mNt ? mSceneObjects[index]->nt : mAir.mNt;
-    Color const attenuation = ni == mAir.mNt ? mAir.mC : mSceneObjects[index]->attenuation;
+    float const nt          = ni == mAir.mNt ? mSceneObjects[index]->mMaterial.mNt : mAir.mNt;
+    Color const attenuation = ni == mAir.mNt ? mAir.mAttenuation : mSceneObjects[index]->mMaterial.mAttenuation;
 
-    if( Settings::mUseReflection || Settings::mUseRefraction )
+    if( AppSettings::mUseReflection || AppSettings::mUseRefraction )
     {
         //calculate the incident vector
         Vec3f const incident = -ray.getDirection();
@@ -302,11 +269,11 @@ Scene::_RayTrace( Ray const & ray, float const ni, int const depth )
             float muRatio;
             if( ni == mAir.mNt )
             {
-                muRatio = mAir.mPermeability / mSceneObjects[index]->permeability;
+                muRatio = mAir.mPermeability / mSceneObjects[index]->mMaterial.mPermeability;
             }
             else
             {
-                muRatio = mSceneObjects[index]->permeability / mAir.mPermeability;
+                muRatio = mSceneObjects[index]->mMaterial.mPermeability / mAir.mPermeability;
             }
 
             float const nRatioDotIN        = nRatio * dotIN;
@@ -326,8 +293,8 @@ Scene::_RayTrace( Ray const & ray, float const ni, int const depth )
             reflectionVector = ( 2 * normal * dotIN - incident ).normalized();
         }
 
-        R *= mSceneObjects[index]->specularCoefficient;
-        T *= mSceneObjects[index]->specularCoefficient;
+        R *= mSceneObjects[index]->mMaterial.mSpecularCoefficient;
+        T *= mSceneObjects[index]->mMaterial.mSpecularCoefficient;
     }
 
     if( ni == mAir.mNt )
@@ -335,19 +302,19 @@ Scene::_RayTrace( Ray const & ray, float const ni, int const depth )
         color = _GetLocalIllumination(index, ray, point, normal, R);
     }
 
-    if( R != 0 && Settings::mUseReflection )
+    if( R != 0 && AppSettings::mUseReflection )
     {
         Ray const reflectionRay = Ray(point + (float)EPSILON * normal, reflectionVector);
         color += R * _RayTrace(reflectionRay, ni, depth - 1);
     }
 
-    if( T != 0 && Settings::mUseRefraction )
+    if( T != 0 && AppSettings::mUseRefraction )
     {
         Ray const transmissionRay = Ray(point - (float)EPSILON * normal, transmissionVector);
         color += T * _RayTrace(transmissionRay, nt, depth - 1);
     }
 
-    if( attenuation != Color( 1, 1, 1 ) && Settings::mUseAttenuation )
+    if( attenuation != Color( 1, 1, 1 ) && AppSettings::mUseAttenuation )
     {
         float exponent = ( ray.getOrigin() - point ).length();
         color *= Color( math<float>().pow( attenuation.r, exponent ),
@@ -395,16 +362,16 @@ Scene::_GetLocalIllumination( unsigned int index, Ray const & ray, Vec3f const &
     Color ambient, diffuse, specular;
 
     //rename some longer identifiers/dereferences
-    Color   Kd  = mSceneObjects[index]->color;
-    float   Ks  = setKs > 0 ? setKs : mSceneObjects[index]->specularCoefficient;
-    float   ns  = mSceneObjects[index]->specularExponent;
+    Color   Kd  = mSceneObjects[index]->mMaterial.mColor;
+    float   Ks  = setKs > 0 ? setKs : mSceneObjects[index]->mMaterial.mSpecularCoefficient;
+    float   ns  = mSceneObjects[index]->mMaterial.mSpecularExponent;
 
     Vec3f lightVector, viewVector, reflectionVector;
 
-    if( Settings::mUseAmbient )
+    if( AppSettings::mUseAmbient )
     {
         //ambient contribution
-        ambient = mAmbientColor * mSceneObjects[ index ]->color;
+        ambient = mAmbientColor * mSceneObjects[ index ]->mMaterial.mColor;
     }
 
     //dummy values and occluder object contact point (for shadows)
@@ -419,9 +386,9 @@ Scene::_GetLocalIllumination( unsigned int index, Ray const & ray, Vec3f const &
         //generate vector to current light
         lightVector = (mLights[i]->p - point).normalized();
 
-        switch( Settings::mShadowMode )
+        switch( AppSettings::mShadowMode )
         {
-            case Settings::kShadowMode_Hard:
+            case AppSettings::kShadowMode_Hard:
                 //determine if pixel is shadowed entirely from current light
                 if( _FindNearestIntersection( uiDummy, Ray( point + normal * (float)EPSILON, lightVector ), shadowPoint, Vec3f() ) )
                 {
@@ -433,7 +400,7 @@ Scene::_GetLocalIllumination( unsigned int index, Ray const & ray, Vec3f const &
                 }
                 break;
 
-            case Settings::kShadowMode_None:
+            case AppSettings::kShadowMode_None:
             default:
                 break;
         }
@@ -445,12 +412,12 @@ Scene::_GetLocalIllumination( unsigned int index, Ray const & ray, Vec3f const &
             continue;
         }
 
-        if( Settings::mUseDiffuse )
+        if( AppSettings::mUseDiffuse )
         {
             diffuse += ( Kd * mLights[ i ]->c * dotNL );
         }
 
-        if( Settings::mUseSpecular )
+        if( AppSettings::mUseSpecular )
         {
             //calculate specular contribution
             reflectionVector = ( normal * 2.0f * dotNL - lightVector ).normalized();

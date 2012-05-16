@@ -5,27 +5,24 @@
 //------------------------------------------------------------------------------
 #include "cinder/Color.h"
 #include "cinder/Vector.h"
+#include "cinder/Quaternion.h"
 #include "cinder/Ray.h"
+
+#include "Material.h"
 //------------------------------------------------------------------------------
 using namespace ci;
 //------------------------------------------------------------------------------
 class SceObject
 {
     public:
-        explicit        SceObject           ();
-        explicit        SceObject           ( float const permittivity, float const permeability );
+        explicit        SceObject           ( Material const & material );
         virtual         ~SceObject          ();
 
         virtual bool    FindIntersection    ( Ray const & ray, float & t, Vec3f & point, Vec3f & normal ) = 0;
-        virtual void    Precalculate        ();
 
-        //surface properties
-        Color   color;
-        float   specularCoefficient;
-        float   specularExponent;
-        Color   attenuation;
-        float   permittivity;
-        float   permeability;
-        float   nt;
+        Material        mMaterial;
+        Vec3f           mPosition;
+        Quatf           mOrientation;
+        Vec3f           mScale;
 };
 //------------------------------------------------------------------------------

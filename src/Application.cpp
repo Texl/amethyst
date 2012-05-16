@@ -8,6 +8,7 @@
 #include "cinder/Surface.h"
 #include "cinder/Thread.h"
 
+#include "AppSettings.h"
 #include "SceScene.h"
 //------------------------------------------------------------------------------
 using namespace ci;
@@ -37,7 +38,9 @@ class Application : public AppBasic
         gl::Texture         mTexture;
 
         mutex               mSurfaceMutex;
-        thread              mThread;
+        condition_variable  mCond;
+        vector<threadPtr>   mThreads;
+        list<Area>          mJobs;
 };
 //------------------------------------------------------------------------------
 Application::Application()
@@ -45,14 +48,21 @@ Application::Application()
 , mSurface      ()
 , mTexture      ()
 , mSurfaceMutex ()
-, mThread       ()
+, mThreads      ()
 {
+    for( unsigned int i = 0; i < AppSettings::mThreadCount; ++i )
+    {
+        mThreads.push_back( threadPtr( new thread ) );
+    }
 }
 //------------------------------------------------------------------------------
 Application::~Application()
 {
-    mThread.interrupt();
-    mThread.join();
+    for( unsigned int i = 0; i < mThreads.size(); ++i )
+    {
+        mThreads[i]->interrupt();
+        mThreads[i]->join();
+    }
 }
 //------------------------------------------------------------------------------
 void
@@ -66,37 +76,55 @@ void Application::setup()
     setFrameRate( 60.0f );
 
     mScene.Load();
-
-    mSurface = Surface8u( getWindowWidth(), getWindowHeight(), false );
-    mTexture = gl::Texture( mSurface );
-
-    mThread = thread(&Application::RenderScreen, this);
 }
 //------------------------------------------------------------------------------
 void
 Application::resize( ResizeEvent event )
 {
-    int height, width;
-
-    mScene.CalculateViewSize( width, height, getWindowWidth() );
-
-    setWindowSize( width, height );
-
-    // Stop render thread
-    mThread.interrupt();
-    mThread.join();
+    // Stop render threads
+    for( unsigned int i = 0; i < mThreads.size(); ++i )
+    {
+        mThreads[i]->interrupt();
+        mThreads[i]->join();
+    }
 
     // Recreate surface
     mSurface = Surface8u( getWindowWidth(), getWindowHeight(), false );
+    memset(mSurface.getData(), 0, 3 * mSurface.getWidth() * mSurface.getHeight() * sizeof(mSurface.getData()[0]));
     mTexture = gl::Texture( mSurface );
 
-    // Start render thread
-    mThread = thread(&Application::RenderScreen, this);
+    // Set up jobs
+    {
+        mSurfaceMutex.lock();
+        mJobs.clear();
+        int areaWidth = 64;
+        int areaHeight = 64;
+        int heightSegments = (int)math<float>::ceil((float)getWindowHeight() / areaHeight);
+        int widthSegments = (int)math<float>::ceil((float)getWindowWidth() / areaWidth);
+
+        for( int j = 0; j < heightSegments; ++j )
+        {
+            for( int i = 0; i < widthSegments; ++i )
+            {
+                mJobs.push_front(Area(i * areaWidth, 
+                                      j * areaHeight, 
+                                      math<int>::clamp((i + 1) * areaWidth, 0, getWindowWidth()), 
+                                      math<int>::clamp((j + 1) * areaHeight, 0, getWindowHeight())));
+            }
+        }
+        mCond.notify_all();
+        mSurfaceMutex.unlock();
+    }
+
+    // Start render threads
+    for( unsigned int i = 0; i < mThreads.size(); ++i )
+    {
+        *mThreads[i] = thread(&Application::RenderScreen, this);
+    }
 }
 //------------------------------------------------------------------------------
 void Application::update()
 {
-    mutex::scoped_lock lock( mSurfaceMutex );
     mTexture.update( (Surface &)mSurface );
 }
 //------------------------------------------------------------------------------
@@ -113,15 +141,28 @@ Application::RenderScreen()
 {
     try
     {
-        for( int i = 0; i < mSurface.getHeight(); ++i )
+        while( 1 )
         {
-            boost::this_thread::sleep( boost::posix_time::milliseconds( 1 ) );
+            // Lock job queue
             mutex::scoped_lock lock( mSurfaceMutex );
-            DrawLine( i );
+            while( mJobs.empty() )
+            {
+                // Wait on a job
+                mCond.wait(lock);
+            }
+
+            // There's a job; get it and relinquish the lock
+            Area area = mJobs.back();
+            mJobs.pop_back();
+            lock.unlock();
+
+            // Draw the job
+            DrawArea( area );
         }
     }
     catch( boost::thread_interrupted const & )
     {
+        // If we're interrupted, just return
         return;
     }
 }
@@ -129,12 +170,14 @@ Application::RenderScreen()
 void 
 Application::DrawArea(Area const & area)
 {
-    Surface8u::Iter iter = mSurface.getIter( Area( area.x1, area.y1, area.getWidth() - 1, area.getHeight() - 1 ) );
+    Surface8u::Iter iter = mSurface.getIter( area );
 
     while( iter.line() )
     {
         while( iter.pixel() )
         {
+            boost::this_thread::interruption_point();
+
             Color color = mScene.GetPixelColor( mSurface.getWidth(), mSurface.getHeight(), iter.x(), iter.y() );
 
             iter.r() = (uint8_t)(math<float>().clamp( color.r, 0, 1 ) * 255);

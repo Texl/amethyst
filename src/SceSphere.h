@@ -10,10 +10,12 @@
 class SceSphere: public SceObject
 {
     public:
+        explicit    SceSphere           ( Vec3f const & center, float const radius, Material const & material );
+        bool        FindIntersection    ( Ray const & ray, float & t, Vec3f & point, Vec3f & normal );
+
+    private:
         Vec3f c;
         float r;
-
-        void Precalculate();
-        bool FindIntersection( Ray const & ray, float &t, Vec3f &point, Vec3f &normal);
+        float rInv;
 };
 //------------------------------------------------------------------------------

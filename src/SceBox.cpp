@@ -3,10 +3,9 @@
 //------------------------------------------------------------------------------
 #include "SceBox.h"
 //------------------------------------------------------------------------------
-void SceBox::Precalculate()
+SceBox::SceBox( Vec3f const & v, Vec3f const & l, Vec3f const & w, Vec3f const & h, Material const & material )
+: SceObject ( material )
 {
-    SceObject::Precalculate();
-
     points[0] = v;
     points[1] = v + w;
     points[2] = v;

@@ -1,18 +1,19 @@
 //------------------------------------------------------------------------------
 #include "AppSettings.h"
 //------------------------------------------------------------------------------
-bool                    Settings::mFisheye          = true;
+bool                    AppSettings::mFisheye           = true;
 
-bool                    Settings::mUseAmbient       = true;
-bool                    Settings::mUseDiffuse       = true;
-bool                    Settings::mUseSpecular      = true;
-Settings::ShadowMode    Settings::mShadowMode       = Settings::kShadowMode_Hard;
+bool                    AppSettings::mUseAmbient        = true;
+bool                    AppSettings::mUseDiffuse        = true;
+bool                    AppSettings::mUseSpecular       = true;
+AppSettings::ShadowMode AppSettings::mShadowMode        = AppSettings::kShadowMode_Hard;
 
-bool                    Settings::mUseReflection    = true;
-bool                    Settings::mUseRefraction    = true;
-bool                    Settings::mUseAttenuation   = true;
-bool                    Settings::mUseSceneRayDepth = false;
-unsigned int            Settings::mMaxRayDepth      = 3;
+bool                    AppSettings::mUseReflection     = true;
+bool                    AppSettings::mUseRefraction     = true;
+bool                    AppSettings::mUseAttenuation    = true;
+bool                    AppSettings::mUseSceneRayDepth  = false;
+unsigned int            AppSettings::mMaxRayDepth       = 3;
 
-unsigned int            Settings::mMultisampleCount = 4;
+unsigned int            AppSettings::mMultisampleCount  = 4;
+unsigned int            AppSettings::mThreadCount       = 8;
 //------------------------------------------------------------------------------

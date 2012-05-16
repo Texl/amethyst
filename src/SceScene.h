@@ -5,19 +5,15 @@
 //------------------------------------------------------------------------------
 #include <string>
 #include <vector>
-#include "SceAir.h"
+#include "cinder/Color.h"
+#include "cinder/Ray.h"
+#include "cinder/Vector.h"
+
 #include "SceCamera.h"
 #include "SceLight.h"
 #include "SceObject.h"
-#include "cinder/Ray.h"
-
-#include "cinder/app/AppBasic.h"
-#include "cinder/Vector.h"
-
-#include "cinder/Color.h"
 //------------------------------------------------------------------------------
 using namespace ci;
-using namespace ci::app;
 //------------------------------------------------------------------------------
 typedef std::vector< SceObject * >  SceObjectPtrVector;
 typedef std::vector< SceLight * >   SceLightPtrVector;
@@ -30,7 +26,6 @@ class Scene
 
         Color               GetPixelColor               ( int const width, int const height, int const x, int const y );
         bool                Load                        ();
-        void                CalculateViewSize           ( int & width, int & height, int minDimension );
 
     private:
         void                _Reset                      ();
@@ -40,7 +35,7 @@ class Scene
 
         SceCamera           mCamera;
         Color               mAmbientColor;
-        SceAir              mAir;
+        Material            mAir;
         int                 mMaxRayDepth;
         SceObjectPtrVector  mSceneObjects;
         SceLightPtrVector   mLights;

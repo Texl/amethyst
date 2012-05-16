@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------------
 #pragma once
 //------------------------------------------------------------------------------
-class Settings
+class AppSettings
 {
     public:
         enum ShadowMode
@@ -33,5 +33,7 @@ class Settings
         static unsigned int mMaxRayDepth;
 
         static unsigned int mMultisampleCount;
+
+        static unsigned int mThreadCount;
 };
 //------------------------------------------------------------------------------

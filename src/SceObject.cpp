@@ -3,25 +3,13 @@
 //------------------------------------------------------------------------------
 #include "SceObject.h"
 //------------------------------------------------------------------------------
-SceObject::SceObject()
-: permittivity  ( 0 )
-, permeability  ( 0 )
+SceObject::SceObject( Material const & material )
+: mMaterial ( material )
 {
-}
-//------------------------------------------------------------------------------
-SceObject::SceObject( float const permittivity, float const permeability )
-: permittivity  ( permittivity )
-, permeability  ( permeability )
-{
+    mMaterial.mNt = sqrt( mMaterial.mPermittivity * mMaterial.mPermeability );
 }
 //------------------------------------------------------------------------------
 SceObject::~SceObject()
 {
-}
-//------------------------------------------------------------------------------
-void
-SceObject::Precalculate()
-{
-    nt = sqrt( permittivity * permeability );
 }
 //------------------------------------------------------------------------------

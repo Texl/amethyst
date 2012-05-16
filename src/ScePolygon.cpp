@@ -3,10 +3,11 @@
 //------------------------------------------------------------------------------
 #include "ScePolygon.h"
 //------------------------------------------------------------------------------
-void ScePolygon::Precalculate()
+ScePolygon::ScePolygon( vector< Vec3f > const & vertices, Material const & material )
+: SceObject ( material )
+, n         ( vertices.size() )
+, v         ( vertices )
 {
-    SceObject::Precalculate();
-
     for(int i = 0; i < n - 2; ++i)
     {
         vc.push_back(v[0]);
@@ -16,8 +17,7 @@ void ScePolygon::Precalculate()
         denom1Inv.push_back(va[i].dot( va[i] ) / ( va[i].dot( va[i] ) * vb[i].dot( vb[i] ) - pow( va[i].dot( vb[i]), 2)));
         denom2Inv.push_back(vb[i].dot( vb[i] ) / ( va[i].dot( va[i] ) * vb[i].dot( vb[i] ) - pow( va[i].dot( vb[i]), 2)));
         denom3Inv.push_back(va[i].dot( vb[i] ) / ( va[i].dot( va[i] ) * vb[i].dot( vb[i] ) - pow( va[i].dot( vb[i]), 2)));
-    }
-}
+    }}
 //------------------------------------------------------------------------------
 bool ScePolygon::FindIntersection( Ray const & ray, float &t, Vec3f &point, Vec3f &normal)
 {

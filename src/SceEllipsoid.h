@@ -12,19 +12,24 @@ using namespace ci;
 //------------------------------------------------------------------------------
 class SceEllipsoid : public SceObject
 {
-    public:
-        explicit    SceEllipsoid        ( Vec3f const & c, Vec3f const & u, Vec3f const & v, Vec3f const & w, Material const & material );
-        bool        FindIntersection    ( Ray const & ray, float & t, Vec3f & point, Vec3f & normal );
+public:
+    explicit    SceEllipsoid    (Vec3f const & c, 
+                                 Vec3f const & u, 
+                                 Vec3f const & v, 
+                                 Vec3f const & w, 
+                                 Material const & material);
 
-    private:
-        Vec3f c;
-        Vec3f u;
-        Vec3f v;
-        Vec3f w;
+    bool        RayCast         (Ray const & ray,
+                                 float & t) const;
 
-        //precalculated variables
-        Matrix33f m;
-        Matrix33f mInv;
-        Matrix33f mInvTInv;
+    bool        RayCast         (Ray const & ray, 
+                                 float & t, 
+                                 Vec3f & point, 
+                                 Vec3f & normal) const;
+
+private:
+    Vec3f       mCenter;
+    Matrix33f   mMatrixInv;
+    Matrix33f   mMatrixInvTInv;
 };
 //------------------------------------------------------------------------------

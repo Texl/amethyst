@@ -5,57 +5,74 @@
 
 #include "SceEllipsoid.h"
 //------------------------------------------------------------------------------
-SceEllipsoid::SceEllipsoid( Vec3f const & c, Vec3f const & u, Vec3f const & v, Vec3f const & w, Material const & material )
-: SceObject ( material )
-, c         ( c )
-, u         ( u )
-, v         ( v )
-, w         ( w )
+SceEllipsoid::SceEllipsoid(Vec3f const & center, 
+                           Vec3f const & u, 
+                           Vec3f const & v, 
+                           Vec3f const & w, 
+                           Material const & material)
+: SceObject         (material)
+, mCenter           (center)
+, mMatrixInv        (Matrix33f(u, v, w).inverted())
+, mMatrixInvTInv    (mMatrixInv.transposed() * mMatrixInv)
 {
-    m = Matrix33f( u, v, w );
-
-    mInv = m.inverted();
-
-    mInvTInv =  mInv.transposed() * mInv;
 }
 //------------------------------------------------------------------------------
-bool SceEllipsoid::FindIntersection( Ray const & ray, float & t, Vec3f & point, Vec3f & normal)
+bool
+SceEllipsoid::RayCast(Ray const & ray,
+                      float & t) const
 {
-    Ray const mInvRay( mInv * ( ray.getOrigin() - c ), mInv * ray.getDirection() );
+    Ray const invRay(mMatrixInv * (ray.getOrigin() - mCenter), mMatrixInv * ray.getDirection());
 
-    float const pa = mInvRay.getDirection().lengthSquared();
-    float const pb = 2 * mInvRay.getOrigin().dot( mInvRay.getDirection() );
-    float const pc = mInvRay.getOrigin().lengthSquared() - 1;
+    float const pa = invRay.getDirection().lengthSquared();
+    float const pb = 2 * invRay.getOrigin().dot(invRay.getDirection());
+    float const pc = invRay.getOrigin().lengthSquared() - 1;
 
     float const discriminant = pb * pb - 4 * pa * pc;
 
-    if( discriminant < 0 )
+    if (discriminant < 0)
     {
         return false;
     }
 
-    float const sqrtDiscriminant = sqrt( discriminant );
+    float const sqrtDiscriminant = sqrt(discriminant);
 
     float const tplus = -pb + sqrtDiscriminant;
 
-    if( tplus < 0 )
+    if (tplus < 0)
     {
         return false;
     }
 
     float const tminus = -pb - sqrtDiscriminant;
 
-    if( tminus < 0 )
+    if (tminus < 0)
     {
-        t = tplus / ( 2 * pa );
+        t = tplus / (2 * pa);
     }
     else
     {
-        t = tminus / ( 2 * pa );
+        t = tminus / (2 * pa);
     }
 
-    point = ray.calcPosition( t );
-    normal = ( mInvTInv * ( point - c ) ).normalized();
     return true;
+}
+//------------------------------------------------------------------------------
+bool
+SceEllipsoid::RayCast(Ray const & ray, 
+                      float & t, 
+                      Vec3f & point, 
+                      Vec3f & normal) const
+{
+    float tIntersection;
+
+    if (RayCast(ray, tIntersection))
+    {
+        t = tIntersection;
+        point = ray.calcPosition(tIntersection);
+        normal = (mMatrixInvTInv * (point - mCenter)).normalized();
+        return true;
+    }
+
+    return false;
 }
 //------------------------------------------------------------------------------

@@ -9,13 +9,21 @@
 //------------------------------------------------------------------------------
 class SceSphere: public SceObject
 {
-    public:
-        explicit    SceSphere           ( Vec3f const & center, float const radius, Material const & material );
-        bool        FindIntersection    ( Ray const & ray, float & t, Vec3f & point, Vec3f & normal );
+public:
+    explicit    SceSphere   (Vec3f const & center, 
+                             float const radius, 
+                             Material const & material);
 
-    private:
-        Vec3f c;
-        float r;
-        float rInv;
+    bool        RayCast     (Ray const & ray,
+                             float & t) const;
+
+    bool        RayCast     (Ray const & ray, 
+                             float & t, 
+                             Vec3f & point, 
+                             Vec3f & normal) const;
+
+private:
+    Vec3f   mCenter;
+    float   mRadius;
 };
 //------------------------------------------------------------------------------

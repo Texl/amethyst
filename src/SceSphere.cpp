@@ -5,49 +5,70 @@
 
 #include "SceSphere.h"
 //------------------------------------------------------------------------------
-SceSphere::SceSphere( Vec3f const & center, float const radius, Material const & material )
-: SceObject ( material )
-, c         ( center )
-, r         ( radius )
+SceSphere::SceSphere(Vec3f const & center,
+                     float const radius, 
+                     Material const & material)
+: SceObject (material)
+, mCenter   (center)
+, mRadius   (radius)
 {
 }
 //------------------------------------------------------------------------------
 bool
-SceSphere::FindIntersection( Ray const & ray, float & t, Vec3f & point, Vec3f & normal)
+SceSphere::RayCast(Ray const & ray,
+                   float & t) const
 {
-    Vec3f const vectorCP = ray.getOrigin() - c;
+    Vec3f const vectorCP = ray.getOrigin() - mCenter;
     float const pa = ray.getDirection().lengthSquared();
-    float const pb = 2 * vectorCP.dot( ray.getDirection() );
-    float const pc = vectorCP.lengthSquared() - r * r;
+    float const pb = 2 * vectorCP.dot(ray.getDirection());
+    float const pc = vectorCP.lengthSquared() - mRadius * mRadius;
 
     float const discriminant = pb * pb - 4 * pa * pc;
 
-    if( discriminant < 0 )
+    if (discriminant < 0)
     {
         return false;
     }
 
-    float const sqrtDiscriminant = math<float>::sqrt( discriminant );
+    float const sqrtDiscriminant = math<float>::sqrt(discriminant);
 
     float const tplus = -pb + sqrtDiscriminant;
 
-    if( tplus < 0 )
+    if (tplus < 0)
     {
         return false;
     }
 
     float const tminus = -pb - sqrtDiscriminant;
-    if( tminus < 0 )
+
+    if (tminus < 0)
     {
-        t = tplus / ( 2 * pa );
+        t = tplus / (2 * pa);
     }
     else
     {
-        t = tminus / ( 2 * pa );
+        t = tminus / (2 * pa);
     }
 
-    point = ray.calcPosition( t );
-    normal = ( point - c ) / r;
     return true;
+}
+//------------------------------------------------------------------------------
+bool
+SceSphere::RayCast(Ray const & ray, 
+                   float & t, 
+                   Vec3f & point, 
+                   Vec3f & normal) const
+{
+    float tIntersection;
+
+    if (RayCast(ray, tIntersection))
+    {
+        t = tIntersection;
+        point = ray.calcPosition(tIntersection);
+        normal = (point - mCenter) / mRadius;
+        return true;
+    }
+
+    return false;
 }
 //------------------------------------------------------------------------------

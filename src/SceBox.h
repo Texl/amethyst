@@ -9,17 +9,27 @@
 //------------------------------------------------------------------------------
 class SceBox: public SceObject
 {
-    public:
-        explicit    SceBox              ( Vec3f const & v, Vec3f const & l, Vec3f const & w, Vec3f const & h, Material const & material );
-        bool        FindIntersection    ( Ray const & ray, float & t, Vec3f & point, Vec3f & normal );
+public:
+    explicit    SceBox      (Vec3f const & origin, 
+                             Vec3f const & length, 
+                             Vec3f const & width, 
+                             Vec3f const & height, 
+                             Material const & material);
 
-    private:
-        Vec3f v;
-        Vec3f l;
-        Vec3f w;
-        Vec3f h;
+    bool        RayCast     (Ray const & ray,
+                             float & t) const;
 
-        Vec3f points[6];
-        Vec3f normals[6];
+    bool        RayCast     (Ray const & ray, 
+                             float & t, 
+                             Vec3f & point, 
+                             Vec3f & normal) const;
+
+private:
+    bool        _RayCast    (Ray const & ray,
+                             float & t,
+                             unsigned int & index) const;
+
+    Vec3f	    mPoints[6];
+    Vec3f	    mNormals[6];
 };
 //------------------------------------------------------------------------------

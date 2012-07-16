@@ -3,74 +3,119 @@
 //------------------------------------------------------------------------------
 #include "SceBox.h"
 //------------------------------------------------------------------------------
-SceBox::SceBox( Vec3f const & v, Vec3f const & l, Vec3f const & w, Vec3f const & h, Material const & material )
-: SceObject ( material )
+SceBox::SceBox(Vec3f const & origin, 
+               Vec3f const & length, 
+               Vec3f const & width,  
+               Vec3f const & height, 
+               Material const & material)
+: SceObject (material)
 {
-    points[0] = v;
-    points[1] = v + w;
-    points[2] = v;
-    points[3] = v + l;
-    points[4] = v;
-    points[5] = v + h;
+    mPoints[0] = origin;
+    mPoints[1] = origin + width;
+    mPoints[2] = origin;
+    mPoints[3] = origin + length;
+    mPoints[4] = origin;
+    mPoints[5] = origin + height;
 
-    normals[0] = l.cross( h ).normalized();
-    normals[1] = normals[0] * -1;
-    normals[2] = h.cross( w ).normalized();
-    normals[3] = normals[2] * -1;
-    normals[4] = w.cross( l ).normalized();
-    normals[5] = normals[4] * -1;
+    mNormals[0] = length.cross(height).normalized();
+    mNormals[1] = -mNormals[0];
+    mNormals[2] = height.cross(width).normalized();
+    mNormals[3] = -mNormals[2];
+    mNormals[4] = width.cross(length).normalized();
+    mNormals[5] = -mNormals[4];
 }
 //------------------------------------------------------------------------------
-bool SceBox::FindIntersection( Ray const & ray, float &t, Vec3f &point, Vec3f &normal)
+bool
+SceBox::RayCast(Ray const & ray,
+                float & t) const
 {
-    float tmin = 0.0f;
-    float tmax = FLT_MAX;
+    float tIntersection;
+    unsigned int index;
 
-    int tminIndex, tmaxIndex, tIndex;
-
-    for(int i = 0; i < 6 && tmin <= tmax; ++i)
+    if (_RayCast(ray, tIntersection, index))
     {
-        float dotDN = ray.getDirection().dot(normals[i]);
-        float dotPPN = ( ray.getOrigin() - points[i] ).dot( normals[i]);
-        float tint = -dotPPN / dotDN;
-        if(dotDN < 0)
+        t = tIntersection;
+        return true;
+    }
+
+    return false;
+}
+//------------------------------------------------------------------------------
+bool
+SceBox::RayCast(Ray const & ray, 
+                float & t, 
+                Vec3f & point, 
+                Vec3f & normal) const
+{
+    float tIntersection;
+    unsigned int index;
+
+    if (_RayCast(ray, tIntersection, index))
+    {
+        t = tIntersection;
+        point = ray.calcPosition(tIntersection);
+        normal = mNormals[index];
+        return true;
+    }
+
+    return false;
+}
+//------------------------------------------------------------------------------
+bool
+SceBox::_RayCast(Ray const & ray,
+                 float & t,
+                 unsigned int & index) const
+{
+    float tMin = 0.0f;
+    float tMax = FLT_MAX;
+
+    int tMinIndex;
+    int tMaxIndex;
+
+    for (int i = 0; i < 6 && tMin <= tMax; ++i)
+    {
+        float dotDN = ray.getDirection().dot(mNormals[i]);
+        float dotPPN = (ray.getOrigin() - mPoints[i]).dot(mNormals[i]);
+        float tIntersection = -dotPPN / dotDN;
+
+        if (dotDN < 0)
         {
-            if(tint > tmin)
+            if (tIntersection > tMin)
             {
-                tminIndex = i;
-                tmin = tint;
+                tMinIndex = i;
+                tMin = tIntersection;
             }
         }
-        else if(dotDN > 0)
+        else if (dotDN > 0)
         {
-            if(tint < tmax)
+            if (tIntersection < tMax)
             {
-                tmaxIndex = i;
-                tmax = tint;
+                tMaxIndex = i;
+                tMax = tIntersection;
             }
         }
-        else if(dotPPN > 0)
+        else if (dotPPN > 0)
         {
             return false;
         }
     }
 
-    if(tmin >= tmax)
-        return false;
-    
-    if(tmin == 0)
+    if (tMin >= tMax)
     {
-        t = tmax;
-        tIndex = tmaxIndex;
+        return false;
+    }
+    
+    if (tMin == 0)
+    {
+        t = tMax;
+        index = tMaxIndex;
     }
     else
     {
-        t = tmin;
-        tIndex = tminIndex;
+        t = tMin;
+        index = tMinIndex;
     }
 
-    point = ray.getOrigin() + t * ray.getDirection();
-    normal = normals[tIndex];
     return true;
 }
 //------------------------------------------------------------------------------

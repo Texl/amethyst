@@ -3,39 +3,38 @@
 //------------------------------------------------------------------------------
 #pragma once
 //------------------------------------------------------------------------------
+#include "cinder/Ray.h"
 #include "cinder/Vector.h"
 //------------------------------------------------------------------------------
 using namespace ci;
 //------------------------------------------------------------------------------
-template <class T>
 class Triangle
 {
-    public:
-        explicit    Triangle    ( Vec3<T> const & a, Vec3<T> const & b, Vec3<T> const & c );
+public:
+    explicit    Triangle    (Vec3f const & a, 
+                             Vec3f const & b, 
+                             Vec3f const & c);
 
-        bool        Raycast     ( Ray const & ray );
+    bool        Raycast     (Ray const & ray) const;
 
-        Vec3<T>     mA;
-        Vec3<T>     mB;
-        Vec3<T>     mC;
+    bool        Raycast     (Ray const & ray,
+                             float & t) const;
+
+    bool        Raycast     (Ray const & ray,
+                             float & t, 
+                             Vec3f & point, 
+                             Vec3f & normal) const;
+
+private:
+    Vec3f   mA;
+    Vec3f   mB;
+    Vec3f   mC;
+    Vec3f   mNormal;
+    Vec3f   mAB;
+    Vec3f   mAC;
+    float   mDot00;
+    float   mDot01;
+    float   mDot11;
+    float   mInvDenom;
 };
-//------------------------------------------------------------------------------
-inline
-template <class T>
-Triangle<T>::Triangle( Vec3<T> const & a, Vec3<T> const & b, Vec3<T> const & c )
-: mA    ( a )
-, mB    ( b )
-, mC    ( c )
-{
-}
-//------------------------------------------------------------------------------
-inline
-template <class T>
-Triangle<T>::Raycast( Ray const & ray )
-{
-    float t;
-    bool const hit = ray.calcTriangleIntersection(mA, mB, mC, &t);
-
-    return hit;
-}
 //------------------------------------------------------------------------------

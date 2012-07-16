@@ -3,26 +3,53 @@
 //------------------------------------------------------------------------------
 #pragma once
 //------------------------------------------------------------------------------
+#include "cinder/Ray.h"
 #include "cinder/Vector.h"
 //------------------------------------------------------------------------------
 using namespace ci;
 //------------------------------------------------------------------------------
-template <class T>
 class Plane
 {
-    public:
-        explicit    Plane   ( Vec3<T> const & point, Vec3<T> const & normal );
+public:
+    explicit    Plane   (Vec3f const & point, 
+                         Vec3f const & normal);
 
-        Vec3<T>     mPoint;
-        Vec3<T>     mNormal;
-        T           mD;
+    bool        Raycast (Ray const & ray,
+                         float & t, 
+                         Vec3f & point, 
+                         Vec3f & normal) const;
+
+private:
+    // mPoint.dot(mNormal) + mD = 0
+    Vec3f   mPoint;
+    Vec3f   mNormal;
 };
 //------------------------------------------------------------------------------
 inline
-template <class T>
-Plane<T>::Plane( Vec3<T> const & point, Vec3<T> const & normal )
-: mPoint    ( point )
-, mNormal   ( normal )
+Plane::Plane(Vec3f const & point, 
+             Vec3f const & normal)
+: mPoint    (point)
+, mNormal   (normal)
 {
+}
+//------------------------------------------------------------------------------
+inline
+bool
+Plane::Raycast(Ray const & ray,
+               float & t, 
+               Vec3f & point, 
+               Vec3f & normal) const
+{
+    float const tIntersection = (mPoint - ray.getOrigin()).dot(mNormal) / ray.getDirection().dot(mNormal);
+
+    if (tIntersection < 0)
+    {
+        return false;
+    }
+
+    t = tIntersection;
+    point = ray.calcPosition(tIntersection);
+    normal = mNormal;
+    return true;
 }
 //------------------------------------------------------------------------------

@@ -15,5 +15,6 @@ bool                    AppSettings::mUseSceneRayDepth  = false;
 unsigned int            AppSettings::mMaxRayDepth       = 3;
 
 unsigned int            AppSettings::mMultisampleCount  = 4;
+
 unsigned int            AppSettings::mThreadCount       = 8;
 //------------------------------------------------------------------------------

@@ -8,9 +8,6 @@
     <Filter Include="Code">
       <UniqueIdentifier>{80ed035c-9afe-423f-bcdf-39e5ba38bcbf}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Code\Objects">
-      <UniqueIdentifier>{339fb3aa-cc12-4700-9dff-dcb9af7e02a8}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\Resources.h">
@@ -28,9 +25,6 @@
     <ClInclude Include="..\src\SceCamera.h">
       <Filter>Code</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\SceHitInfo.h">
-      <Filter>Code</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\SceLight.h">
       <Filter>Code</Filter>
     </ClInclude>
@@ -40,20 +34,23 @@
     <ClInclude Include="..\src\Triangle.h">
       <Filter>Code</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\SceSphere.h">
-      <Filter>Code\Objects</Filter>
+    <ClInclude Include="..\src\Application.h">
+      <Filter>Code</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\SceObject.h">
-      <Filter>Code\Objects</Filter>
+    <ClInclude Include="..\src\SceSphere.h">
+      <Filter>Code</Filter>
     </ClInclude>
     <ClInclude Include="..\src\SceBox.h">
-      <Filter>Code\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\ScePolygon.h">
-      <Filter>Code\Objects</Filter>
+      <Filter>Code</Filter>
     </ClInclude>
     <ClInclude Include="..\src\SceEllipsoid.h">
-      <Filter>Code\Objects</Filter>
+      <Filter>Code</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SceObject.h">
+      <Filter>Code</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ScePolygon.h">
+      <Filter>Code</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -68,29 +65,26 @@
     <ClCompile Include="..\src\AppSettings.cpp">
       <Filter>Code</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\SceCamera.cpp">
-      <Filter>Code</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\SceLight.cpp">
-      <Filter>Code</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\SceScene.cpp">
       <Filter>Code</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\SceSphere.cpp">
-      <Filter>Code\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\SceObject.cpp">
-      <Filter>Code\Objects</Filter>
+    <ClCompile Include="..\src\Triangle.cpp">
+      <Filter>Code</Filter>
     </ClCompile>
     <ClCompile Include="..\src\SceBox.cpp">
-      <Filter>Code\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\ScePolygon.cpp">
-      <Filter>Code\Objects</Filter>
+      <Filter>Code</Filter>
     </ClCompile>
     <ClCompile Include="..\src\SceEllipsoid.cpp">
-      <Filter>Code\Objects</Filter>
+      <Filter>Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SceObject.cpp">
+      <Filter>Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScePolygon.cpp">
+      <Filter>Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SceSphere.cpp">
+      <Filter>Code</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

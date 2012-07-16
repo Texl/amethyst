@@ -10,20 +10,22 @@ using namespace ci;
 //------------------------------------------------------------------------------
 class SceLight
 {
-    public:
-        SceLight    (Vec3f const & p, Color const & c, float r);
+public:
+    explicit    SceLight    (Vec3f const & p, 
+                             Color const & c, 
+                             float r);
 
-    public:
-        Vec3f   p;
-        Color   c;
-        float   r;
+public:
+    Vec3f   p;
+    Color   c;
+    float   r;
 };
 //------------------------------------------------------------------------------
 inline
 SceLight::SceLight(Vec3f const & p, Color const & c, float r)
-: p ( p )
-, c ( c )
-, r ( r )
+: p (p)
+, c (c)
+, r (r)
 {
 }
 //------------------------------------------------------------------------------

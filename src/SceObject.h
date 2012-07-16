@@ -14,15 +14,19 @@ using namespace ci;
 //------------------------------------------------------------------------------
 class SceObject
 {
-    public:
-        explicit        SceObject           ( Material const & material );
-        virtual         ~SceObject          ();
+public:
+    explicit        SceObject   (Material const & material);
 
-        virtual bool    FindIntersection    ( Ray const & ray, float & t, Vec3f & point, Vec3f & normal ) = 0;
+    virtual         ~SceObject  ();
 
-        Material        mMaterial;
-        Vec3f           mPosition;
-        Quatf           mOrientation;
-        Vec3f           mScale;
+    virtual bool    RayCast     (Ray const & ray,
+                                 float & t) const = 0;
+
+    virtual bool    RayCast     (Ray const & ray, 
+                                 float & t, 
+                                 Vec3f & point, 
+                                 Vec3f & normal) const = 0;
+
+    Material        mMaterial;
 };
 //------------------------------------------------------------------------------

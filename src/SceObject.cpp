@@ -3,10 +3,10 @@
 //------------------------------------------------------------------------------
 #include "SceObject.h"
 //------------------------------------------------------------------------------
-SceObject::SceObject( Material const & material )
-: mMaterial ( material )
+SceObject::SceObject(Material const & material)
+: mMaterial (material)
 {
-    mMaterial.mNt = sqrt( mMaterial.mPermittivity * mMaterial.mPermeability );
+    mMaterial.mNt = sqrt(mMaterial.mPermittivity * mMaterial.mPermeability);
 }
 //------------------------------------------------------------------------------
 SceObject::~SceObject()

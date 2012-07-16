@@ -10,20 +10,23 @@ using namespace ci;
 //------------------------------------------------------------------------------
 class Material
 {
-    public:
-        Material();
-        Material( float const permittivity, float const permeability, Color const & color );
+public:
+    explicit    Material    ();
 
-        bool operator==( Material const & rhs ) const;
+    explicit    Material    (float const permittivity, 
+                             float const permeability, 
+                             Color const & color);
 
-    public:
-        Color   mColor;
-        float   mSpecularCoefficient;
-        float   mSpecularExponent;
-        Color   mAttenuation;
-        float   mPermittivity;
-        float   mPermeability;
-        float   mNt;
+    bool        operator==  (Material const & rhs) const;
+
+public:
+    Color   mColor;
+    float   mSpecularCoefficient;
+    float   mSpecularExponent;
+    Color   mAttenuation;
+    float   mPermittivity;
+    float   mPermeability;
+    float   mNt;
 };
 //-----------------------------------------------------------------------------
 inline
@@ -39,20 +42,22 @@ Material::Material()
 }
 //-----------------------------------------------------------------------------
 inline
-Material::Material( float const permittivity, float const permeability, Color const & color )
+Material::Material(float const permittivity, 
+                   float const permeability, 
+                   Color const & color)
 : mColor                ()
 , mSpecularCoefficient  ()
 , mSpecularExponent     ()
-, mAttenuation          ( color )
-, mPermittivity         ( permittivity )
-, mPermeability         ( permeability )
+, mAttenuation          (color)
+, mPermittivity         (permittivity)
+, mPermeability         (permeability)
 , mNt                   ()
 {
 }
 //-----------------------------------------------------------------------------
 inline
 bool
-Material::operator==( Material const & rhs ) const
+Material::operator==(Material const & rhs) const
 {
     return mColor == rhs.mColor &&
            mSpecularCoefficient == rhs.mSpecularCoefficient &&
